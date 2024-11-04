@@ -1,9 +1,88 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>List Box</title>
-        <script>
-            function showdatatype() {
+<html lang="en">
+<head>
+    <title>List Box</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+        body {
+            background-color: rgba(88, 65, 2, 0.5);
+            background-image: url('nusuk.webp');
+            background-size: cover;
+
+        }
+
+        .better-header {
+            font-size: 50px;
+            text-align: center;
+            color: aliceblue
+        }
+
+        .better-text {
+            font-size: 32px;
+            text-align: center;
+            color: aliceblue;
+            text-align: center;
+        }
+
+        .better-select {
+            color: rgb(0, 0, 0);
+            font-size: 32px;
+            width: 200;
+            height: 50;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1 class="better-header">User interface</h1>
+    <p class="better-text">please enter any information you know to help us find your camp</p>
+    <label for="infoo" class="better-text">Choose an avaliable data:</label>
+    <select id="infoo" name="infoo" onchange="showdatatype()" class="better-select">
+        <option value="selection">Please select</option>
+        <option value="cardid">card ID</option>
+        <option value="campid">camp ID</option>
+    </select>
+
+    
+    <div id="cardid-input" class="input-box" style="display: none;">
+            <label for="cardidinfo">Enter card ID:</label>
+            <input type="text" id="id" name="cardidinfo">
+            <button onclick="fetchData()">Search</button>
+    </div>
+
+    
+    <div id="campid-input" class="input-box" style="display: none;">
+        <label for="campidinfo">Enter camp ID:</label>
+        <input type="text" id="campidinfo" name="campidinfo">
+    </div>
+
+    
+    <div style="margin: 50px; align-items: center;">
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d4679.7868045823625!2d39.830388968228476!3d21.41524871761283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2ssa!4v1730480047064!5m2!1sen!2ssa"
+            width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    
+      <div>
+          <div>
+              <b>Your ID is:</b> <p id="pilgrim-id"></p>
+          </div>
+          <div>
+              <b>Your Name is:</b> <p id="pilgrim-name"></p>
+          </div>
+          <div>
+              <b>Your Camp is:</b> <p id="pilgrim-camp"></p>
+          </div>
+      </div>
+
+    
+    <script>
+        function showdatatype() {
             var selectedValue = document.getElementById("infoo").value;
             var inputBoxes = document.getElementsByClassName("input-box");
 
@@ -17,59 +96,42 @@
             }
         }
 
-        </script>
-        <style>
-            body {
-                background-color: rgba(88, 65, 2, 0.5);
-                background-image: url('nusuk.webp');
-                background-size: cover;
+        async function fetchData() {
+            // Get the input value
+            const input = document.getElementById("id").value;
+
+            try {
+                // Send a POST request to the Flask backend
+                const response = await fetch('/get_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input: input })
+                });
+    
+                    // Check if the response is OK (status code 200-299)
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+    
+                // Parse the JSON response
+                const pilgrim = await response.json();
+                // const pilgrim_id = pilgrim[0]
+                console.log("Response data:", pilgrim[0]['pilgrim_name']);
                 
+    
+    
+                // Display the output in the paragraph element
+                document.getElementById("pilgrim-id").innerText = pilgrim[0]["pilgrim_id"];
+                document.getElementById("pilgrim-name").innerText = pilgrim[1]["pilgrim_name"];
+                document.getElementById("pilgrim-camp").innerText = pilgrim[2]["pilgrim_camp"];
             }
-            .better-header {
-                font-size: 50px;
-                text-align: center;
-                color:aliceblue
-
+            catch (error) {
+                console.error("Error:", error);
+                document.getElementById("output").innerText = "Error retrieving data.";
             }
-            .better-text {
-                font-size: 32px;
-                text-align: center;
-                color:aliceblue;
-                text-align: center;
-            }
-            .better-select{
-                color: rgb(0, 0, 0);
-                font-size: 32px;
-                width: 200;
-                height: 50;
-                text-align: center;
-            }
-        </style>
-
-    </head>
-    <body>
-        <h1 class="better-header">User interface</h1>
-        <p class="better-text">please enter any information you know to help us find your camp</p>
-        <label for="infoo" class="better-text">Choose an avaliable data:</label>
-            <select id="infoo" name="infoo" onchange="showdatatype()" class="better-select">
-                <option value="selection">Please select</option>
-                <option value="cardid">card ID</option>
-                <option value="campid">camp ID</option>
-            </select>
-            <div id="cardid-input" class="input-box" style="display: none;">
-                <label for="cardidinfo">Enter card ID:</label>
-                <input type="text" id="cardidinfo" name="cardidinfo">
-            </div>
-            
-            <div id="campid-input" class="input-box" style="display: none;">
-                <label for="campidinfo">Enter camp ID:</label>
-                <input type="text" id="campidinfo" name="campidinfo">
-            </div>
-            <div style="margin: 50px; align-items: center;">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d4679.7868045823625!2d39.830388968228476!3d21.41524871761283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2ssa!4v1730480047064!5m2!1sen!2ssa" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-
-            </div>
-            
-    </body>
-
+        }
+    </script>
+</body>
 </html>

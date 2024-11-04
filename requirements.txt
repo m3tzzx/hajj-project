@@ -1,0 +1,5 @@
+Flask
+sqlalchemy
+gunicorn
+pymysql
+pymysql2==1.3.3
